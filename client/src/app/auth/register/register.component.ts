@@ -1,5 +1,9 @@
+import { AuthService } from './../auth.service';
+import { User } from './../models/user';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -33,7 +37,8 @@ export class RegisterComponent implements OnInit {
     'SP','SE','TO'
   ];
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private service: AuthService, 
+    private snackbar: MatSnackBar, private router: Router) { }
 
   ngOnInit() {
   }
@@ -50,7 +55,16 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(){
-
+    console.log(this.formRegister.value);
+    let u: User = {
+      ...this.formRegister.value, password: this.formRegister.value.password1
+    };
+    this.service.register(u).subscribe((u) =>{
+      this.snackbar.open('Sucessfuly registered. User your credentials to sign in', "OK", {duration: 2000})
+      this.router.navigateByUrl('/auth/login');
+    }, (err) => {
+      this.snackbar.open(err.error.message, "OK", {duration: 2000})
+    })
   }
 
 }
